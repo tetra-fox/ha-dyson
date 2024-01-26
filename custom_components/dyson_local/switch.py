@@ -23,6 +23,7 @@ async def async_setup_entry(
     entities = [
         DysonNightModeSwitchEntity(device, name),
         DysonContinuousMonitoringSwitchEntity(device, name),
+        DysonManualSwitchEntity(device, name),
     ]
     if isinstance(device, DysonPureHotCoolLink):
         entities.append(DysonFocusModeSwitchEntity(device, name))
@@ -125,3 +126,32 @@ class DysonFocusModeSwitchEntity(DysonEntity, SwitchEntity):
     def turn_off(self):
         """Turn off switch."""
         return self._device.disable_focus_mode()
+
+class DysonManualSwitchEntity(DysonEntity, SwitchEntity):
+    """Dyson fan manual switch."""
+
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_icon = "mdi:car-shift-pattern"
+
+    @property
+    def sub_name(self):
+        """Return the name of the entity."""
+        return "Manual"
+
+    @property
+    def sub_unique_id(self):
+        """Return the unique id of the entity."""
+        return "manual"
+
+    @property
+    def is_on(self):
+        """Return if switch is on."""
+        return not self._device.auto_mode
+
+    def turn_on(self):
+        """Turn on switch."""
+        return self._device.disable_auto_mode()
+
+    def turn_off(self):
+        """Turn off switch."""
+        return self._device.enable_auto_mode()
